@@ -30,3 +30,21 @@ print("Max revenue:", df["revenue"].max())
 print("\n*** Orders per customer (describe):")
 order_per_customer = df.groupby("customer_id").size()
 print(order_per_customer.describe())
+
+# Aggregate orders to customer level 
+
+customer_df = (
+    df
+    .groupby("customer_id")
+    .agg(
+        orders_count=("revenue", "count"),
+        total_revenue=("revenue", "sum"),
+        avg_order_value=("revenue", "mean"),
+        first_order_date=("order_date", "min"),
+        last_order_date=("order_date", "max"),
+    )
+    .reset_index()
+)
+
+print("\n*** CUSTOMER LEVEL TABLE ***")
+print(customer_df.head())
