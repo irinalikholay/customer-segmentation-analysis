@@ -10,6 +10,10 @@ RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "orders_raw.csv"
 
 df = pd.read_csv(RAW_DATA_PATH)
 
+## Convert order date to datetime
+
+df["order_date"] = pd.to_datetime(df["order_date"])
+
 ## Basic structure check 
 
 print("\*** BASIC INFO ***")
@@ -89,3 +93,50 @@ print(customer_df["total_revenue"].describe())
 
 print("\n*** DISTRIBUTION: AVG ORDER VALUE ***")
 print(customer_df["avg_order_value"].describe())
+
+## Customer segmentation
+
+print("\n*** CUSTOMER SEGMENTATION ***")
+
+print("\n*** Order count ***")
+
+def activity_segment(x):
+    if x == 1:
+        return "one order"
+    elif 2 <= x <= 4:
+        return "repeat"
+    else:
+        return "loyal"
+    
+customer_df["activity_segment"] = customer_df["orders_count"].apply(activity_segment)
+
+print("\nActivity segment distribution:")
+print(customer_df["activity_segment"].value_counts())
+
+print("\n*** Revenue ***")
+
+revenue_q50 = customer_df["total_revenue"].quantile(0.5)
+revenue_q75 = customer_df["total_revenue"].quantile(0.75)
+
+def value_segment(x):
+    if x <= revenue_q50:
+        return "low value"
+    elif x <= revenue_q75:
+        return "mid value"
+    else:
+        return "high value"
+    
+customer_df["value_segment"] = customer_df["total_revenue"].apply(value_segment)
+
+print("\nValue segment distribution:")
+print(customer_df["value_segment"].value_counts())
+
+print("\n*** Combined ***")
+
+customer_df["customer_segment"] = (
+    customer_df["activity_segment"] + "_" + customer_df["value_segment"]
+)
+
+print("\nCombined customer segments:")
+print(customer_df["customer_segment"].value_counts(10))
+
