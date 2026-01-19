@@ -1,10 +1,17 @@
 import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns 
 from pathlib import Path
 
 ## Define project paths
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "orders_raw.csv"
+
+## Create folder for plots 
+
+PLOTS_PATH = PROJECT_ROOT / "plots"
+PLOTS_PATH.mkdir(exist_ok=True)
 
 ## Load raw data 
 
@@ -140,3 +147,56 @@ customer_df["customer_segment"] = (
 print("\nCombined customer segments:")
 print(customer_df["customer_segment"].value_counts(10))
 
+## Visualization 
+
+# Customer segment distribution (bar chart)
+
+segment_count = customer_df["customer_segment"].value_counts()
+
+plt.figure(figsize=(10, 5))
+segment_count.plot(kind="bar")
+plt.title("Customer segment distribution")
+plt.xlabel("Customer segment")
+plt.ylabel("Number of Customers")
+plt.xticks(rotation=45, ha="right")
+plt.tight_layout()
+
+plt.savefig(PLOTS_PATH / "customer_segment_distribution.png", dpi=300)
+plt.show()
+plt.close()
+
+# Revenue distribution by segment (boxplot)
+
+plt.figure(figsize=(10, 5))
+sns.boxplot(
+    data=customer_df,
+    x="customer_segment",
+    y="total_revenue"
+)
+plt.title("Revenue distribution by customer")
+plt.xlabel("Customer segment")
+plt.ylabel("Total revenue")
+plt.xticks(rotation=45, ha="right")
+plt.tight_layout()
+
+plt.savefig(PLOTS_PATH / "revenue_distribution_by_segment.png", dpi=300)
+plt.show()
+plt.close()
+
+# Revenue share by segment (pie chart)
+
+revenue_by_segment = (
+    customer_df
+    .groupby("customer_segment")["total_revenue"]
+    .sum()
+    .sort_values(ascending=False)
+)
+plt.figure(figsize=(8, 8))
+revenue_by_segment.plot(kind="pie")
+plt.title("Revenue share by customer segment")
+plt.ylabel("")
+plt.tight_layout()
+
+plt.savefig(PLOTS_PATH / "revenue_share_by_segment.png", dpi=300)
+plt.show()
+plt.close()
