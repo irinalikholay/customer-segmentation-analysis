@@ -13,6 +13,11 @@ RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "orders_raw.csv"
 PLOTS_PATH = PROJECT_ROOT / "plots"
 PLOTS_PATH.mkdir(exist_ok=True)
 
+## Paths for processed (final) dataset
+
+PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed"
+OUTPUT_CUSTOMER_FILE = PROCESSED_DATA_PATH / "customer_segments.csv"
+
 ## Load raw data 
 
 df = pd.read_csv(RAW_DATA_PATH)
@@ -200,3 +205,14 @@ plt.tight_layout()
 plt.savefig(PLOTS_PATH / "revenue_share_by_segment.png", dpi=300)
 plt.show()
 plt.close()
+
+## Save final customer-level dataset
+
+PROCESSED_DATA_PATH.mkdir(parents=True, exist_ok=True)
+
+customer_df.to_csv(OUTPUT_CUSTOMER_FILE, index=False)
+
+print("\n*** FINAL DATA SAVED ***")
+print("File:", OUTPUT_CUSTOMER_FILE)
+print("Rows:", len(customer_df))
+print("Columns:", list(customer_df.columns))
